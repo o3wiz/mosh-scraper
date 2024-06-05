@@ -1,0 +1,21 @@
+{
+  "name": "mosh_course_scraper",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "tsc && node dst/main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/dotenv": "^8.2.0",
+    "@types/puppeteer": "^7.0.4",
+    "change-case": "^5.4.4",
+    "dotenv": "^16.4.5",
+    "install": "^0.13.0",
+    "puppeteer": "^22.10.0"
+  }
+}

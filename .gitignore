@@ -1,0 +1,6 @@
+cookies.json
+cookies.txt
+links.txt
+/node_modules
+/dst
+.env
