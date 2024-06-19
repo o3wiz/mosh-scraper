@@ -6,6 +6,8 @@ dotenv.config();
 
 const MEMBERS_URL: string = process.env.MEMBERS_URL || "";
 const COURSE_URL: string = `${MEMBERS_URL}${process.env.COURSE || ""}`;
+// use this chrome extension
+// https://chromewebstore.google.com/detail/export-cookie-json-file-f/nmckokihipjgplolmcmjakknndddifde?pli=1
 const COOKIES_PATH: string = process.env.COOKIES_PATH || "";
 const ARIA2C_OUTPUT: string = process.env.ARIA2C_OUTPUT || "";
 
@@ -132,20 +134,28 @@ function makeAriaLinksFile(course: Course): string[] {
         const sectionNameRegexPattern = new RegExp(/(.*) \(.*$/);
         return sectionName.replace(sectionNameRegexPattern, (_, firstGroup) => toSnakeCase(firstGroup));
     };
-    const chapterNameModifier = (chapterName: string): string => {
-        const chapterNameRegexPattern = new RegExp(/(\d+)\- (.*) \(.*/);
+    const chapterNameModifier = (chapterName: string, chapterNumber: string = ""): string => {
+        const chapterWithNumberRegex = new RegExp(/(\d+)\- (.*) \(.*/);
+        const chapterWithoutNumberRegex = new RegExp(/(.*) \(.*/);
+        if (chapterName.match(chapterWithNumberRegex)) {
+            return chapterName.replace(
+                chapterWithNumberRegex,
+                (_, chapterNumber, chapterName) => `${chapterNumber}_${toSnakeCase(chapterName)}`
+            );
+        }
         return chapterName.replace(
-            chapterNameRegexPattern,
-            (_, chapterNumber, chapterName) => `${chapterNumber}_${toSnakeCase(chapterName)}`
+            chapterWithoutNumberRegex,
+            (_, chapterName) => `${chapterNumber}_${toSnakeCase(chapterName)}`
         );
     };
     const links: string[] = [];
     const courseName = courseNameModifier(course.name);
     for (const [sectionIndex, section] of course.sections.entries()) {
-        const sectionNumber = (sectionIndex + 1).toString().padStart(2, '0');
+        const sectionNumber = (sectionIndex + 1).toString().padStart(2, "0");
         const sectionName = sectionNameModifier(section.name);
-        for (const chapter of section.chapters) {
-            const chapterName = chapterNameModifier(chapter.name);
+        for (const [chapterIndex, chapter] of section.chapters.entries()) {
+            const chapterNumber = (chapterIndex + 1).toString().padStart(2, "0");
+            const chapterName = chapterNameModifier(chapter.name, chapterNumber);
             const downloadUrl = chapter.downloadUrl;
             links.push(`${downloadUrl}\n out=./${courseName}/${sectionNumber}_${sectionName}/${chapterName}.mp4`);
         }
